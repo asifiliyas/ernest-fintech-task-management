@@ -148,7 +148,8 @@ export default function DashboardPage() {
     const [formDesc, setFormDesc] = useState("");
     const [formLoading, setFormLoading] = useState(false);
 
-    // Delete confirm
+    // States for UX
+    const [togglingId, setTogglingId] = useState<string | null>(null);
     const [deleteId, setDeleteId] = useState<string | null>(null);
     const [deleteLoading, setDeleteLoading] = useState(false);
 
@@ -173,12 +174,15 @@ export default function DashboardPage() {
     }, [user, authLoading, fetchTasks, router]);
 
     const handleToggle = async (id: string) => {
+        setTogglingId(id);
         try {
             await api.patch(`/tasks/${id}/toggle`);
             toast.success("Status updated");
-            fetchTasks(true);
+            await fetchTasks(true);
         } catch {
             toast.error("Failed to update status");
+        } finally {
+            setTogglingId(null);
         }
     };
 
@@ -303,25 +307,50 @@ export default function DashboardPage() {
                         <div className="xl:col-span-2 space-y-5">
                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                                 <h3 className="text-lg font-black text-[#2b3674]">Your Tasks</h3>
-                                <div className="flex gap-2 items-center">
-                                    <div className="search-container flex-1 sm:w-56">
+                                <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                                    <div className="search-container flex-1 sm:w-64">
                                         <Search size={16} className="text-[#a3aed0] shrink-0" />
-                                        <input type="text" placeholder="Search..." className="search-input"
+                                        <input type="text" placeholder="Search tasks..." className="search-input"
                                             value={search} onChange={e => setSearch(e.target.value)} />
                                     </div>
-                                    <select value={status} onChange={e => setStatus(e.target.value)}
-                                        className="bg-white border border-[#e9edf7] rounded-xl px-3 py-2.5 text-xs font-black text-[#2b3674] cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#4318ff]/20">
-                                        <option value="">All</option>
-                                        <option value="pending">Pending</option>
-                                        <option value="completed">Completed</option>
-                                    </select>
+
+                                    {/* Premium Filter Controls */}
+                                    <div className="flex bg-white/50 p-1 rounded-xl border border-[#e9edf7] self-start sm:self-auto">
+                                        {[
+                                            { id: "", label: "All" },
+                                            { id: "pending", label: "Pending" },
+                                            { id: "completed", label: "Done" }
+                                        ].map((btn) => (
+                                            <button
+                                                key={btn.id}
+                                                onClick={() => setStatus(btn.id)}
+                                                className={cn(
+                                                    "px-4 py-1.5 text-[10px] font-black uppercase tracking-wider rounded-lg transition-all",
+                                                    status === btn.id
+                                                        ? "bg-white text-[#4318ff] shadow-sm ring-1 ring-[#e9edf7]"
+                                                        : "text-[#a3aed0] hover:text-[#2b3674]"
+                                                )}
+                                            >
+                                                {btn.label}
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
 
                             <div className="space-y-3">
                                 <AnimatePresence mode="popLayout" initial={false}>
                                     {loading ? (
-                                        Array.from({ length: 3 }).map((_, i) => <div key={i} className="task-card h-20 animate-pulse" />)
+                                        Array.from({ length: 4 }).map((_, i) => (
+                                            <div key={i} className="task-card flex items-center gap-4 overflow-hidden relative">
+                                                <div className="h-7 w-7 rounded-lg bg-[#f4f7fe] shrink-0 animate-pulse" />
+                                                <div className="flex-1 space-y-2">
+                                                    <div className="h-4 bg-[#f4f7fe] rounded w-1/3 animate-pulse" />
+                                                    <div className="h-2 bg-[#f4f7fe] rounded w-20 animate-pulse" />
+                                                </div>
+                                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent shimmer-effect" />
+                                            </div>
+                                        ))
                                     ) : tasks.length === 0 ? (
                                         <div className="py-16 text-center rounded-2xl border-2 border-dashed border-[#e9edf7]">
                                             <ClipboardList size={32} className="mx-auto mb-3 text-[#e9edf7]" />
@@ -331,16 +360,37 @@ export default function DashboardPage() {
                                         tasks.map(task => (
                                             <motion.div key={task.id} layout
                                                 initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.98 }}
-                                                className={cn("task-card flex items-center gap-4 group",
+                                                className={cn("task-card flex items-center gap-4 group relative overflow-hidden",
                                                     task.status === "completed" && "opacity-70")}>
 
+                                                {/* Progress Battery Loader (Top Edge) */}
+                                                {togglingId === task.id && (
+                                                    <div className="absolute top-0 left-0 right-0 h-1 bg-[#f4f7fe]">
+                                                        <motion.div
+                                                            className="h-full bg-[#4318ff]"
+                                                            initial={{ width: "0%" }}
+                                                            animate={{ width: "100%" }}
+                                                            transition={{ duration: 1.5, repeat: Infinity }}
+                                                        />
+                                                    </div>
+                                                )}
+
                                                 {/* Toggle checkbox */}
-                                                <button onClick={() => handleToggle(task.id)}
-                                                    className={cn("h-7 w-7 rounded-lg border-2 flex items-center justify-center shrink-0 transition-all",
+                                                <button
+                                                    onClick={() => handleToggle(task.id)}
+                                                    disabled={togglingId === task.id}
+                                                    className={cn("h-7 w-7 rounded-lg border-2 flex items-center justify-center shrink-0 transition-all relative overflow-hidden",
                                                         task.status === "completed"
                                                             ? "bg-[#05cd99] border-[#05cd99] text-white"
-                                                            : "border-[#e9edf7] text-transparent hover:border-[#4318ff]")}>
-                                                    <CheckCircle2 size={14} />
+                                                            : "border-[#e9edf7] text-transparent hover:border-[#4318ff]")}
+                                                >
+                                                    {togglingId === task.id ? (
+                                                        <div className="absolute inset-0 flex items-center justify-center bg-[#4318ff]">
+                                                            <div className="h-3 w-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                                        </div>
+                                                    ) : (
+                                                        <CheckCircle2 size={14} />
+                                                    )}
                                                 </button>
 
                                                 {/* Content */}

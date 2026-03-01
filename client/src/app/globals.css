@@ -133,3 +133,20 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #a3aed0;
 }
+
+/* ─── Shimmer Effect ─── */
+.shimmer-effect {
+  background: linear-gradient(90deg, transparent 25%, rgba(67, 24, 255, 0.1) 50%, transparent 75%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(100%);
+  }
+}
