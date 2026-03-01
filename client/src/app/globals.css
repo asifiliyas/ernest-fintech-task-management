@@ -1,0 +1,135 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+
+  --color-brand: #2b3674;
+  --color-background: #f4f7fe;
+  --color-foreground: #1b2559;
+  --color-primary: #4318ff;
+  --color-secondary: #a3aed0;
+  --color-success: #05cd99;
+  --color-warning: #ffb547;
+  --color-error: #ee5d50;
+
+  --radius-xxl: 24px;
+  --radius-xl: 16px;
+  --radius-lg: 12px;
+  --radius-md: 8px;
+
+  --animate-fade-in: fadeIn 0.4s ease-out;
+  --animate-slide-up: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideUp {
+    from {
+      transform: translateY(15px);
+      opacity: 0;
+    }
+
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+}
+
+@layer base {
+  body {
+    background-color: #f4f7fe;
+    color: #1b2559;
+    font-family: var(--font-sans);
+    @apply antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-black tracking-tight;
+    color: #2b3674;
+  }
+}
+
+/* ─── Reusable card classes (plain CSS to avoid Tailwind v4 shadow issues) ─── */
+.task-card {
+  background: white;
+  border-radius: 16px;
+  padding: 1rem 1.25rem;
+  box-shadow: 0 4px 24px rgba(112, 144, 176, 0.08);
+  transition: all 0.15s ease;
+}
+
+.task-card:hover {
+  box-shadow: 0 8px 30px rgba(112, 144, 176, 0.14);
+}
+
+.cal-card {
+  background: white;
+  border-radius: 20px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 24px rgba(112, 144, 176, 0.08);
+}
+
+.welcome-banner {
+  background: #1b2559;
+  border-radius: 24px;
+  padding: 2.5rem;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(27, 37, 89, 0.25);
+}
+
+/* ─── Search ─── */
+.search-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #f4f7fe;
+  border-radius: 12px;
+  padding: 0 0.75rem;
+  height: 2.75rem;
+}
+
+.search-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #2b3674;
+  width: 100%;
+}
+
+.search-input::placeholder {
+  color: #a3aed0;
+}
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #e0e5f2;
+  border-radius: 99px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a3aed0;
+}
