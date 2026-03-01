@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { User } from "../types";
+import { User, AuthResponse } from "../types";
 import api from "../lib/api";
 
 interface AuthContextType {
@@ -29,7 +29,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }, []);
 
     const login = async (email: string, password: string) => {
-        const { data } = await api.post("/auth/login", { email, password });
+        const { data } = await api.post("/auth/login", { email, password }) as { data: AuthResponse };
         localStorage.setItem("accessToken", data.accessToken);
         localStorage.setItem("refreshToken", data.refreshToken);
         localStorage.setItem("user", JSON.stringify(data.user));
@@ -38,7 +38,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     const register = async (email: string, password: string, name?: string) => {
-        const { data } = await api.post("/auth/register", { email, password, name });
+        const { data } = await api.post("/auth/register", { email, password, name }) as { data: AuthResponse };
         localStorage.setItem("accessToken", data.accessToken);
         localStorage.setItem("refreshToken", data.refreshToken);
         localStorage.setItem("user", JSON.stringify(data.user));
