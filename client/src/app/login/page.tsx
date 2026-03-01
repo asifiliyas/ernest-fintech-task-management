@@ -43,7 +43,7 @@ export default function LoginPage() {
                     </p>
                 </div>
 
-                <div className="bg-white rounded-2xl p-8 shadow-[0_4px_24px_rgba(112,144,176,0.08)]">
+                <div className="bg-white rounded-2xl p-8 shadow-xl">
                     <form onSubmit={handleSubmit} className="space-y-5">
                         <div>
                             <label className="text-[10px] font-black text-[#a3aed0] uppercase tracking-wider block mb-1.5">Email</label>
