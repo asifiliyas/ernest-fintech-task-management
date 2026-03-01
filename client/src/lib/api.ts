@@ -1,4 +1,5 @@
 import axios from "axios";
+import { AuthResponse } from "../types";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -10,7 +11,7 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("accessToken");
-    if (token) {
+    if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
@@ -34,12 +35,14 @@ api.interceptors.response.use(
 
         const { data } = await axios.post(`${API_BASE_URL}/auth/refresh`, {
           refreshToken,
-        });
+        }) as { data: AuthResponse };
 
         localStorage.setItem("accessToken", data.accessToken);
         
         // Update original request and retry
-        originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
+        if (originalRequest.headers) {
+          originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
+        }
         return api(originalRequest);
       } catch (refreshError) {
         localStorage.removeItem("accessToken");
