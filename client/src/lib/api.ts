@@ -2,6 +2,7 @@ import axios from "axios";
 import { AuthResponse } from "../types";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+console.log("Connect to API:", API_BASE_URL);
 
 const api = axios.create({
   baseURL: API_BASE_URL,
